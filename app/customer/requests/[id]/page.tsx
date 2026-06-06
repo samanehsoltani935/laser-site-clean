@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const dynamicParams = true;
+
 import { getSession } from "@/lib/auth/session";
 import { getRequestById } from "@/lib/services/request.service";
 import { redirect, notFound } from "next/navigation";
