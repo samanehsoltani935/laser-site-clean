@@ -1,0 +1,45 @@
+/* ۱. دستورات پایه Tailwind (اینا حتماً باید اول باشن) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ۲. فونت‌ها */
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* ۳. لایه‌ها و استایل‌های شخصی */
+@layer base {
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+  }
+}
+
+@layer utilities {
+  .font-roboto {
+    font-family: 'Roboto', sans-serif;
+  }
+}
+
+@keyframes phoneAttentionPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(47, 99, 134, 0.45);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 10px rgba(47, 99, 134, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(47, 99, 134, 0);
+  }
+}
+
+.phone-attention-pulse {
+  animation: phoneAttentionPulse 1.4s ease-in-out infinite;
+  will-change: transform, box-shadow;
+}
+
+.phone-attention-pulse:hover {
+  animation-play-state: paused;
+}
