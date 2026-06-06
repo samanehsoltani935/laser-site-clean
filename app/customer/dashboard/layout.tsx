@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+export const dynamicParams = true;
 
-export default function CustomerDashboardLayout({
+export default function CustomerLayout({
   children,
 }: {
   children: React.ReactNode;
