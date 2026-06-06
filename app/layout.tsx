@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import type { Metadata } from "next";
 import { Roboto, Vazirmatn } from "next/font/google";
 import SiteHeader from "@/components/site/SiteHeader";
