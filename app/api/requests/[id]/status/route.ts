@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import { NextRequest } from "next/server";
 import { apiError, apiSuccess, requireRole, zodFirstError } from "@/lib/api/helpers";
 import { getApiSession } from "@/lib/auth/api-session";
