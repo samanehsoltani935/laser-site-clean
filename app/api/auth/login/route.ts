@@ -1,22 +1,13 @@
 ﻿import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createHash } from "crypto";
 import { prisma } from "@/lib/db/prisma";
+import { createSession, getDashboardPath } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function hashPassword(password: string) {
   return createHash("sha256").update(password).digest("hex");
-}
-
-function createSimpleToken(userId: string) {
-  return Buffer.from(
-    JSON.stringify({
-      userId,
-      createdAt: Date.now(),
-    })
-  ).toString("base64");
 }
 
 export async function POST(req: Request) {
@@ -69,18 +60,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = createSimpleToken(user.id);
-
-    cookies().set("cabok_session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+    await createSession({
+      userId: user.id,
+      role: user.role,
+      email: user.email,
+      fullName: user.fullName,
     });
+
+    const redirectTo = getDashboardPath(user.role);
 
     return NextResponse.json({
       message: "ورود با موفقیت انجام شد.",
+      redirectTo,
       user: {
         id: user.id,
         fullName: user.fullName,
