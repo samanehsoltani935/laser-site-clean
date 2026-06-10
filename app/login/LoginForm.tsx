@@ -19,27 +19,48 @@ export default function LoginForm() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const body = {
-      email: formData.get("email"),
-      password: formData.get("password"),
-    };
+
+    const identifier = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        credentials: "include",
+        body: JSON.stringify({
+          identifier,
+          password,
+        }),
       });
+
       const json = await res.json();
 
-      if (!json.success) {
-        toast(json.error || "خطا در ورود", "error");
+      if (!res.ok) {
+        toast(json.message || "خطا در ورود", "error");
         return;
       }
 
-      toast("ورود موفق", "success");
-      const redirect = searchParams.get("redirect") || json.data.redirectTo;
-      router.push(redirect);
+      toast(json.message || "ورود موفق", "success");
+
+      const role = json.user?.role;
+      const redirectFromUrl = searchParams.get("redirect");
+
+      let redirectTo = "/dashboard";
+
+      if (redirectFromUrl) {
+        redirectTo = redirectFromUrl;
+      } else if (role === "CUSTOMER") {
+        redirectTo = "/customer/dashboard";
+      } else if (role === "MANAGER") {
+        redirectTo = "/manager/dashboard";
+      } else if (role === "TECHNICIAN") {
+        redirectTo = "/technician/requests";
+      } else if (role === "SUPPORT") {
+        redirectTo = "/dashboard/support";
+      }
+
+      router.replace(redirectTo);
       router.refresh();
     } catch {
       toast("خطا در ارتباط با سرور", "error");
@@ -69,6 +90,7 @@ export default function LoginForm() {
               dir="ltr"
               required
             />
+
             <Input
               id="password"
               name="password"
@@ -76,6 +98,7 @@ export default function LoginForm() {
               label="رمز عبور"
               required
             />
+
             <Button type="submit" loading={loading} className="w-full">
               ورود
             </Button>
@@ -83,7 +106,10 @@ export default function LoginForm() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             حساب کاربری ندارید؟{" "}
-            <Link href="/register" className="text-primary font-semibold hover:underline">
+            <Link
+              href="/register"
+              className="text-primary font-semibold hover:underline"
+            >
               ثبت‌نام
             </Link>
           </p>
