@@ -18,7 +18,18 @@ export default function RegisterPage() {
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
-    const body = Object.fromEntries(formData.entries());
+
+    const body = {
+      fullName: String(formData.get("fullName") || "").trim(),
+      clinicName: String(formData.get("clinicName") || "").trim(),
+      email: String(formData.get("email") || "").trim(),
+      phone: String(formData.get("phone") || "").trim(),
+      clinicAddress: String(formData.get("clinicAddress") || "").trim(),
+      nationalCodeOrCompanyId: String(
+        formData.get("nationalCodeOrCompanyId") || ""
+      ).trim(),
+      password: String(formData.get("password") || ""),
+    };
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -26,15 +37,17 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+
       const json = await res.json();
 
-      if (!json.success) {
-        toast(json.error || "خطا در ثبت‌نام", "error");
+      if (!res.ok) {
+        toast(json.message || "خطا در ثبت‌نام", "error");
         return;
       }
 
-      toast("ثبت‌نام موفق", "success");
-      router.push(json.data.redirectTo);
+      toast(json.message || "ثبت‌نام با موفقیت انجام شد", "success");
+
+      router.replace("/login");
       router.refresh();
     } catch {
       toast("خطا در ارتباط با سرور", "error");
