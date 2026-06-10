@@ -37,31 +37,35 @@ export default function LoginForm() {
       const json = await res.json();
 
       if (!res.ok) {
-        toast(json.message || "خطا در ورود", "error");
+        toast(json.message || json.error || "خطا در ورود", "error");
         return;
       }
 
       toast(json.message || "ورود موفق", "success");
 
-      const role = json.user?.role;
+      const user = json.user || json.data?.user;
+      const role = user?.role;
+
       const redirectFromUrl = searchParams.get("redirect");
+      const redirectFromApi = json.redirectTo || json.data?.redirectTo;
 
-      let redirectTo = "/dashboard";
+      let redirectTo = redirectFromUrl || redirectFromApi;
 
-      if (redirectFromUrl) {
-        redirectTo = redirectFromUrl;
-      } else if (role === "CUSTOMER") {
-        redirectTo = "/customer/dashboard";
-      } else if (role === "MANAGER") {
-        redirectTo = "/manager/dashboard";
-      } else if (role === "TECHNICIAN") {
-        redirectTo = "/technician/requests";
-      } else if (role === "SUPPORT") {
-        redirectTo = "/dashboard/support";
+      if (!redirectTo) {
+        if (role === "CUSTOMER") {
+          redirectTo = "/customer/dashboard";
+        } else if (role === "MANAGER") {
+          redirectTo = "/manager/dashboard";
+        } else if (role === "TECHNICIAN") {
+          redirectTo = "/technician/requests";
+        } else if (role === "SUPPORT") {
+          redirectTo = "/dashboard/support";
+        } else {
+          redirectTo = "/customer/dashboard";
+        }
       }
 
-      router.replace(redirectTo);
-      router.refresh();
+      window.location.href = redirectTo;
     } catch {
       toast("خطا در ارتباط با سرور", "error");
     } finally {
