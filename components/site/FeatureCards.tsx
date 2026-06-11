@@ -19,19 +19,19 @@ const features: Feature[] = [
   {
     title: "ثبت درخواست آنلاین",
     description: "ثبت سریع درخواست تعمیر و سرویس از طریق فرم آنلاین",
-    href: "/support/request",
+    href: "/customer/requests/new",
     icon: ClipboardList,
   },
   {
     title: "پیگیری وضعیت سرویس",
     description: "مشاهده لحظه‌ای مراحل رسیدگی به درخواست شما",
-    href: "/support/tracking",
+    href: "/customer/requests",
     icon: Search,
   },
   {
     title: "مدیریت گارانتی",
     description: "استعلام وضعیت گارانتی دستگاه با شماره سریال",
-    href: "/support/warranty",
+    href: "/customer/devices",
     icon: ShieldCheck,
   },
   {

@@ -25,9 +25,9 @@ const navItems: NavItem[] = [
   {
     label: "پشتیبانی",
     children: [
-      { label: "ثبت درخواست خدمات", href: "/support/new-request" },
-      { label: "پیگیری درخواست", href: "/support/tracking" },
-      { label: "استعلام گارانتی", href: "/support/warranty" },
+      { label: "ثبت درخواست خدمات", href: "/customer/requests/new" },
+      { label: "پیگیری درخواست", href: "/customer/requests" },
+      { label: "استعلام گارانتی", href: "/customer/devices" }, 
     ],
   },
   {

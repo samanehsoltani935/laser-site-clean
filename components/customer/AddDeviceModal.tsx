@@ -24,24 +24,30 @@ export function AddDeviceModal({
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     setErrors({});
+
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
       const result = await addDeviceAction(formData);
+
       if (result.success) {
         toast("دستگاه با موفقیت ثبت شد", "success");
         onClose();
         router.refresh();
       } else {
-        toast(result.error || "خطا در ثبت", "error");
+        toast(result.error || "خطا در ثبت دستگاه", "error");
       }
     });
   }
 
   const modelOptions = [
     { value: "", label: "انتخاب مدل..." },
-    ...DEVICE_MODELS.map((m) => ({ value: m, label: m })),
+    ...DEVICE_MODELS.map((model) => ({
+      value: model,
+      label: model,
+    })),
   ];
 
   return (
@@ -51,16 +57,18 @@ export function AddDeviceModal({
           id="deviceName"
           name="deviceName"
           label="نام دستگاه"
-          placeholder="مثلاً: لیزر آلکساندرایت"
+          placeholder="مثلاً لیزر الکساندرایت"
         />
+
         <Select
           id="model"
           name="model"
-          label="مدل"
+          label="مدل دستگاه"
           required
           options={modelOptions}
           error={errors.model}
         />
+
         <Input
           id="serialNumber"
           name="serialNumber"
@@ -70,22 +78,26 @@ export function AddDeviceModal({
           required
           error={errors.serialNumber}
         />
+
         <Input
           id="installationDate"
           name="installationDate"
           label="تاریخ نصب"
           type="date"
         />
+
         <Input
           id="branch"
           name="branch"
           label="شعبه"
-          placeholder="مثلاً: شعبه مرکزی"
+          placeholder="مثلاً شعبه مرکزی"
         />
+
         <div className="flex gap-3 pt-2">
           <Button type="submit" loading={pending} className="flex-1">
             ثبت دستگاه
           </Button>
+
           <Button
             type="button"
             variant="outline"
@@ -102,6 +114,7 @@ export function AddDeviceModal({
 
 export function AddDeviceButton() {
   const [open, setOpen] = useState(false);
+
   return (
     <>
       <Button onClick={() => setOpen(true)}>افزودن دستگاه</Button>

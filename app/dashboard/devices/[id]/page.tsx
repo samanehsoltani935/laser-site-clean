@@ -34,19 +34,24 @@ const mockDevices: Device[] = [
 export default async function DeviceDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
   const device = mockDevices.find((d) => d.id === id);
 
   if (!device) {
     return (
       <div className="space-y-3">
         <h1 className="text-lg font-bold text-gray-900">جزئیات دستگاه</h1>
+
         <div className="rounded-2xl border border-gray-100 bg-white p-4 text-sm text-gray-600">
           دستگاهی با این شناسه پیدا نشد.
         </div>
-        <Link className="text-sm font-semibold text-primary" href="/dashboard/devices">
+
+        <Link
+          className="text-sm font-semibold text-primary"
+          href="/dashboard/devices"
+        >
           بازگشت به لیست دستگاه‌ها
         </Link>
       </div>
@@ -58,6 +63,7 @@ export default async function DeviceDetailsPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-lg font-bold text-gray-900">جزئیات دستگاه</h1>
+
           <p className="text-sm text-gray-500 mt-1">
             {device.model} —{" "}
             <span className="font-mono" dir="ltr">
@@ -75,7 +81,9 @@ export default async function DeviceDetailsPage({
           </Link>
 
           <Link
-            href={`/support/new-request?serial=${encodeURIComponent(device.serial)}`}
+            href={`/customer/requests/new?serial=${encodeURIComponent(
+              device.serial
+            )}`}
             className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition"
           >
             ثبت درخواست برای این دستگاه
@@ -89,6 +97,7 @@ export default async function DeviceDetailsPage({
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Info label="مدل دستگاه" value={device.model} />
+
             <Info
               label="شماره سریال"
               value={
@@ -97,6 +106,7 @@ export default async function DeviceDetailsPage({
                 </span>
               }
             />
+
             <Info label="شعبه/واحد" value={device.branch || "—"} />
             <Info label="تاریخ نصب" value={device.installDate || "—"} />
             <Info label="اعتبار گارانتی تا" value={device.warrantyUntil || "—"} />
@@ -104,7 +114,9 @@ export default async function DeviceDetailsPage({
 
           <div className="mt-4 rounded-xl bg-gray-50 p-4">
             <div className="text-xs font-semibold text-gray-600">یادداشت</div>
-            <div className="text-sm text-gray-700 mt-1">{device.notes || "—"}</div>
+            <div className="text-sm text-gray-700 mt-1">
+              {device.notes || "—"}
+            </div>
           </div>
         </div>
 
@@ -112,14 +124,18 @@ export default async function DeviceDetailsPage({
           <div className="text-sm font-bold text-gray-900">اقدامات سریع</div>
 
           <Link
-            href={`/support/new-request?serial=${encodeURIComponent(device.serial)}`}
+            href={`/customer/requests/new?serial=${encodeURIComponent(
+              device.serial
+            )}`}
             className="block text-center px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition"
           >
             ثبت درخواست خدمات
           </Link>
 
           <Link
-            href={`/support/tracking?serial=${encodeURIComponent(device.serial)}`}
+            href={`/customer/requests?serial=${encodeURIComponent(
+              device.serial
+            )}`}
             className="block text-center px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
           >
             پیگیری درخواست‌ها

@@ -3,9 +3,9 @@ import Container from "@/components/Container";
 
 const quickLinks = [
   { label: "خانه", href: "/" },
-  { label: "ثبت درخواست خدمات", href: "/support/request" },
-  { label: "پیگیری درخواست", href: "/support/tracking" },
-  { label: "استعلام گارانتی", href: "/support/warranty" },
+  { label: "ثبت درخواست خدمات", href: "/customer/requests/new" },
+  { label: "پیگیری درخواست", href: "/customer/requests" },
+  { label: "استعلام گارانتی", href: "/customer/devices" },
   { label: "قطعات و مصرفی‌ها", href: "/parts" },
   { label: "آموزش", href: "/training" },
   { label: "تماس با ما", href: "/contact" },

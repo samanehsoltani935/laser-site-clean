@@ -40,14 +40,14 @@ export default function HeroSection() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/support/request"
+              href="/customer/requests/new"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-primary shadow-lg transition hover:bg-sky-50"
             >
               درخواست سرویس
               <ArrowLeft size={18} />
             </Link>
             <Link
-              href="/support/tracking"
+              href="/customer/requests"
               className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
             >
               <Search size={18} />

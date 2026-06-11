@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils";
 const PHONE_DISPLAY = "021-72153000";
 
 const supportLinks = [
-  { label: "ثبت درخواست خدمات", href: "/support/request" },
-  { label: "پیگیری درخواست", href: "/support/tracking" },
-  { label: "استعلام گارانتی", href: "/support/warranty" },
+  { label: "ثبت درخواست خدمات", href: "/customer/requests/new" },
+  { label: "پیگیری درخواست", href: "/customer/requests" },
+  { label: "استعلام گارانتی", href: "/customer/devices" },
 ];
 
 const navLinks = [

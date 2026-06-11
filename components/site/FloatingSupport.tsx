@@ -16,7 +16,7 @@ export default function FloatingSupport() {
         <Phone size={20} />
       </a>
       <Link
-        href="/support/request"
+        href="/customer/requests/new"
         className="flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:scale-105 hover:bg-primary/90 hover:shadow-xl"
       >
         <Headphones size={18} />
