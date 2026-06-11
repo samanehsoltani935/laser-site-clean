@@ -26,7 +26,9 @@ export default function LoginForm() {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify({
           identifier,
@@ -37,11 +39,11 @@ export default function LoginForm() {
       const json = await res.json();
 
       if (!res.ok) {
-        toast(json.message || json.error || "خطا در ورود", "error");
+        toast(json.message || json.error || "خطا در ورود به سامانه", "error");
         return;
       }
 
-      toast(json.message || "ورود موفق", "success");
+      toast(json.message || "ورود با موفقیت انجام شد", "success");
 
       const user = json.user || json.data?.user;
       const role = user?.role;
@@ -59,7 +61,7 @@ export default function LoginForm() {
         } else if (role === "TECHNICIAN") {
           redirectTo = "/technician/requests";
         } else if (role === "SUPPORT") {
-          redirectTo = "/dashboard/support";
+          redirectTo = "/manager/dashboard";
         } else {
           redirectTo = "/customer/dashboard";
         }
@@ -74,13 +76,19 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4 py-12 bg-[#f8fafc]">
+    <div className="flex min-h-[70vh] items-center justify-center bg-[#f8fafc] px-4 py-12">
       <Card className="w-full max-w-md">
         <CardContent>
-          <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-gray-900">ورود به سیستم</h1>
-            <p className="text-sm text-gray-500 mt-2">
-              سیستم خدمات پس از فروش دستگاه لیزر پوست — کابوک طب
+          <div className="mb-6 text-center">
+            <h1 className="text-xl font-bold text-gray-900">ورود اعضا</h1>
+
+            <p className="mt-2 text-sm font-medium text-primary">
+              سامانه خدمات پس از فروش کابوک طب
+            </p>
+
+            <p className="mt-2 text-xs leading-6 text-gray-500">
+              مشتریان، کارشناسان فنی، پشتیبان‌ها و مدیران از این بخش وارد پنل
+              اختصاصی خود می‌شوند.
             </p>
           </div>
 
@@ -104,17 +112,14 @@ export default function LoginForm() {
             />
 
             <Button type="submit" loading={loading} className="w-full">
-              ورود
+              ورود به سامانه
             </Button>
           </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            حساب کاربری ندارید؟{" "}
-            <Link
-              href="/register"
-              className="text-primary font-semibold hover:underline"
-            >
-              ثبت‌نام
+          <p className="mt-6 text-center text-sm text-gray-500">
+            حساب مشتری ندارید؟{" "}
+            <Link href="/register" className="font-semibold text-primary hover:underline">
+              ثبت‌نام مشتریان
             </Link>
           </p>
         </CardContent>

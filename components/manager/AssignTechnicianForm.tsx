@@ -14,45 +14,60 @@ export function AssignTechnicianForm({
   technicians: { id: string; fullName: string }[];
   currentTechnicianId: string | null;
 }) {
-  const [techId, setTechId] = useState(currentTechnicianId || "");
+  const [technicianId, setTechnicianId] = useState(currentTechnicianId || "");
   const [loading, setLoading] = useState(false);
+
   const { toast } = useToast();
   const router = useRouter();
 
-  async function assign() {
-    if (!techId) return;
+  async function assignTechnician() {
+    if (!technicianId) {
+      toast("یک کارشناس فنی انتخاب کنید", "error");
+      return;
+    }
+
     setLoading(true);
+
     const res = await fetch(`/api/requests/${requestId}/assign`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ technicianId: techId }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        technicianId,
+      }),
     });
+
     const json = await res.json();
+
     setLoading(false);
+
     if (json.success) {
-      toast("تکنسین اختصاص یافت", "success");
+      toast("درخواست با موفقیت به کارشناس فنی ارجاع شد", "success");
       router.refresh();
     } else {
-      toast(json.error, "error");
+      toast(json.error || "خطا در ارجاع درخواست", "error");
     }
   }
 
   return (
-    <div className="flex gap-1">
+    <div className="flex min-w-[230px] items-center gap-2">
       <select
-        value={techId}
-        onChange={(e) => setTechId(e.target.value)}
-        className="rounded-lg border border-gray-200 px-2 py-1 text-xs"
+        value={technicianId}
+        onChange={(e) => setTechnicianId(e.target.value)}
+        className="h-9 flex-1 rounded-lg border border-gray-200 bg-white px-2 text-xs text-gray-700 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
       >
-        <option value="">انتخاب...</option>
-        {technicians.map((t) => (
-          <option key={t.id} value={t.id}>
-            {t.fullName}
+        <option value="">انتخاب کارشناس</option>
+
+        {technicians.map((technician) => (
+          <option key={technician.id} value={technician.id}>
+            {technician.fullName}
           </option>
         ))}
       </select>
-      <Button size="sm" onClick={assign} loading={loading}>
-        اختصاص
+
+      <Button size="sm" onClick={assignTechnician} loading={loading}>
+        ارجاع
       </Button>
     </div>
   );

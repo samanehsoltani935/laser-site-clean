@@ -66,12 +66,13 @@ export default function SiteHeader() {
                 aria-expanded={supportOpen}
                 aria-haspopup="true"
               >
-                پشتیبانی
+                خدمات پس از فروش
                 <ChevronDown
                   size={14}
                   className={cn("opacity-60 transition-transform", supportOpen && "rotate-180")}
                 />
               </button>
+
               {supportOpen && (
                 <div className="absolute right-0 top-full z-50 min-w-[220px] rounded-xl border border-gray-100 bg-white py-2 shadow-2xl">
                   {supportLinks.map((link) => (
@@ -111,13 +112,13 @@ export default function SiteHeader() {
               href="/login"
               className="hidden rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 sm:inline-flex"
             >
-              پنل مشتریان
+              ورود اعضا
             </Link>
 
             <button
               type="button"
               className="rounded-lg p-2 text-gray-600 transition hover:bg-gray-100 lg:hidden"
-              onClick={() => setMobileOpen((v) => !v)}
+              onClick={() => setMobileOpen((value) => !value)}
               aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -126,10 +127,7 @@ export default function SiteHeader() {
         </div>
 
         {mobileOpen && (
-          <nav
-            className="border-t border-gray-100 py-4 lg:hidden"
-            aria-label="منوی موبایل"
-          >
+          <nav className="border-t border-gray-100 py-4 lg:hidden" aria-label="منوی موبایل">
             <div className="space-y-1">
               <Link
                 href="/"
@@ -138,7 +136,11 @@ export default function SiteHeader() {
               >
                 خانه
               </Link>
-              <p className="px-3 pt-2 text-xs font-bold text-gray-400">پشتیبانی</p>
+
+              <p className="px-3 pt-2 text-xs font-bold text-gray-400">
+                خدمات پس از فروش
+              </p>
+
               {supportLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -149,6 +151,7 @@ export default function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
+
               {navLinks.slice(1).map((link) => (
                 <Link
                   key={link.href}
@@ -159,6 +162,7 @@ export default function SiteHeader() {
                   {link.label}
                 </Link>
               ))}
+
               <a
                 href="tel:02172153000"
                 className="phone-attention-pulse mt-3 flex items-center gap-2 rounded-full border border-primary/50 bg-sky-100 px-3.5 py-2.5 text-sm font-bold text-primary transition hover:bg-sky-50"
@@ -166,12 +170,13 @@ export default function SiteHeader() {
                 <Phone size={16} />
                 <span dir="ltr">{PHONE_DISPLAY}</span>
               </a>
+
               <Link
                 href="/login"
                 className="mt-2 block rounded-xl bg-primary px-4 py-3 text-center text-sm font-semibold text-white"
                 onClick={() => setMobileOpen(false)}
               >
-                پنل مشتریان
+                ورود اعضا
               </Link>
             </div>
           </nav>

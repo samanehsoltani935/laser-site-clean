@@ -1,121 +1,285 @@
-"use client";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
-import { useEffect, useState } from "react";
-import { LoadingSpinner } from "@/components/shared/EmptyState";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/auth/session";
+import { prisma } from "@/lib/db/prisma";
+import { StatusBadge, PriorityBadge } from "@/components/shared/Badges";
 
-type Kpis = {
-  totalRequests: number;
-  newRequests: number;
-  activeRequests: number;
-  completedRequests: number;
-  averageResponseTimeHours: number;
-  mttrHours: number;
-  warrantyRequests: number;
-  consumedSpareParts: number;
-  technicianPerformance: { id: string; name: string; completed: number }[];
-};
+export default async function ManagerDashboardPage() {
+  const session = await getSession();
 
-const COLORS = ["#355d7d", "#0ea5e9", "#22c55e", "#f59e0b"];
+  if (!session) {
+    redirect("/login");
+  }
 
-export default function ManagerDashboardPage() {
-  const [kpis, setKpis] = useState<Kpis | null>(null);
+  if (session.role !== "MANAGER" && session.role !== "SUPPORT") {
+    redirect("/login");
+  }
 
-  useEffect(() => {
-    fetch("/api/manager/kpis")
-      .then((r) => r.json())
-      .then((json) => {
-        if (json.success) setKpis(json.data);
-      });
-  }, []);
+  const [
+    totalRequests,
+    newRequests,
+    activeRequests,
+    completedRequests,
+    customerCount,
+    technicianCount,
+    deviceCount,
+    latestRequests,
+  ] = await Promise.all([
+    prisma.serviceRequest.count(),
 
-  if (!kpis) return <LoadingSpinner />;
+    prisma.serviceRequest.count({
+      where: {
+        status: "NEW",
+      },
+    }),
 
-  const statusData = [
-    { name: "جدید", value: kpis.newRequests },
-    { name: "فعال", value: kpis.activeRequests },
-    { name: "تکمیل", value: kpis.completedRequests },
+    prisma.serviceRequest.count({
+      where: {
+        status: {
+          notIn: ["COMPLETED", "CLOSED", "REJECTED"],
+        },
+      },
+    }),
+
+    prisma.serviceRequest.count({
+      where: {
+        status: "COMPLETED",
+      },
+    }),
+
+    prisma.user.count({
+      where: {
+        role: "CUSTOMER",
+      },
+    }),
+
+    prisma.user.count({
+      where: {
+        role: "TECHNICIAN",
+      },
+    }),
+
+    prisma.device.count(),
+
+    prisma.serviceRequest.findMany({
+      take: 6,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        customer: {
+          include: {
+            user: true,
+          },
+        },
+        device: true,
+      },
+    }),
+  ]);
+
+  const cards = [
+    {
+      title: "کل درخواست‌ها",
+      value: totalRequests,
+      desc: "تمام درخواست‌های ثبت‌شده",
+      href: "/manager/requests",
+    },
+    {
+      title: "درخواست‌های جدید",
+      value: newRequests,
+      desc: "در انتظار بررسی اولیه",
+      href: "/manager/requests",
+    },
+    {
+      title: "درخواست‌های فعال",
+      value: activeRequests,
+      desc: "در حال بررسی یا انجام",
+      href: "/manager/requests",
+    },
+    {
+      title: "درخواست‌های تکمیل‌شده",
+      value: completedRequests,
+      desc: "سرویس‌های پایان‌یافته",
+      href: "/manager/reports",
+    },
+    {
+      title: "مشتریان",
+      value: customerCount,
+      desc: "کاربران با نقش مشتری",
+      href: "/manager/users",
+    },
+    {
+      title: "کارشناسان فنی",
+      value: technicianCount,
+      desc: "کاربران با نقش کارشناس",
+      href: "/manager/users",
+    },
+    {
+      title: "دستگاه‌ها",
+      value: deviceCount,
+      desc: "دستگاه‌های ثبت‌شده",
+      href: "/manager/devices",
+    },
   ];
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-lg font-bold text-gray-900">داشبورد مدیریت</h1>
-        <p className="text-sm text-gray-500 mt-1">نمای کلی عملکرد خدمات پس از فروش</p>
+      <div className="rounded-2xl bg-gradient-to-l from-primary to-sky-500 p-6 text-white shadow-sm">
+        <h1 className="text-xl font-bold">داشبورد مدیریت</h1>
+
+        <p className="mt-2 text-sm leading-7 text-white/90">
+          نمای کلی از وضعیت درخواست‌ها، مشتریان، دستگاه‌ها و عملکرد خدمات پس از
+          فروش
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiCard title="کل درخواست‌ها" value={kpis.totalRequests} />
-        <KpiCard title="درخواست‌های جدید" value={kpis.newRequests} />
-        <KpiCard title="درخواست‌های فعال" value={kpis.activeRequests} />
-        <KpiCard title="تکمیل‌شده" value={kpis.completedRequests} />
-        <KpiCard title="میانگین پاسخ (ساعت)" value={kpis.averageResponseTimeHours} />
-        <KpiCard title="MTTR (ساعت)" value={kpis.mttrHours} />
-        <KpiCard title="گارانتی منقضی" value={kpis.warrantyRequests} />
-        <KpiCard title="قطعات مصرفی" value={kpis.consumedSpareParts} />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => (
+          <Link
+            key={card.title}
+            href={card.href}
+            className="block rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="text-sm text-gray-500">{card.title}</div>
+
+            <div className="mt-2 text-3xl font-bold text-primary">
+              {card.value}
+            </div>
+
+            <div className="mt-2 text-xs text-gray-500">{card.desc}</div>
+          </Link>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader title="توزیع وضعیت درخواست‌ها" />
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label
-                >
-                  {statusData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold text-gray-900">
+                آخرین درخواست‌های ثبت‌شده
+              </h2>
 
-        <Card>
-          <CardHeader title="عملکرد تکنسین‌ها" />
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={kpis.technicianPerformance}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="completed" fill="#355d7d" name="تکمیل‌شده" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+              <p className="mt-1 text-sm text-gray-500">
+                جدیدترین درخواست‌های خدمات مشتریان
+              </p>
+            </div>
+
+            <Link
+              href="/manager/requests"
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              مشاهده همه
+            </Link>
+          </div>
+
+          {latestRequests.length === 0 ? (
+            <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-500">
+              هنوز درخواستی ثبت نشده است.
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-xl border border-gray-100">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-sm">
+                  <thead className="bg-gray-50 text-gray-600">
+                    <tr>
+                      <th className="px-4 py-3 text-right font-medium">
+                        کد پیگیری
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        مشتری
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        دستگاه
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        اولویت
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        وضعیت
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium">
+                        تاریخ ثبت
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {latestRequests.map((request) => (
+                      <tr
+                        key={request.id}
+                        className="border-t border-gray-50 transition hover:bg-gray-50/50"
+                      >
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/manager/requests/${request.id}`}
+                            className="font-mono font-medium text-primary hover:underline"
+                            dir="ltr"
+                          >
+                            {request.trackingCode}
+                          </Link>
+                        </td>
+
+                        <td className="px-4 py-3 text-gray-700">
+                          {request.customer.user.fullName}
+                        </td>
+
+                        <td className="px-4 py-3 text-gray-600">
+                          {request.device.model}
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <PriorityBadge priority={request.priority} />
+                        </td>
+
+                        <td className="px-4 py-3">
+                          <StatusBadge status={request.status} />
+                        </td>
+
+                        <td className="px-4 py-3 text-gray-500">
+                          {request.createdAt.toLocaleDateString("fa-IR")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <h2 className="text-base font-bold text-gray-900">
+            دسترسی سریع مدیریتی
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            مسیرهای اصلی برای مدیریت سیستم
+          </p>
+
+          <div className="mt-4 space-y-2">
+            <QuickLink href="/manager/requests" label="مدیریت درخواست‌ها" />
+            <QuickLink href="/manager/users" label="مدیریت کاربران" />
+            <QuickLink href="/manager/devices" label="مدیریت دستگاه‌ها" />
+            <QuickLink href="/manager/spare-parts" label="قطعات یدکی" />
+            <QuickLink href="/manager/reports" label="گزارش‌ها" />
+            <QuickLink href="/manager/notifications" label="اعلان‌ها" />
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function KpiCard({ title, value }: { title: string; value: number }) {
+function QuickLink({ href, label }: { href: string; label: string }) {
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-4">
-      <div className="text-xs text-gray-500">{title}</div>
-      <div className="text-2xl font-bold text-primary mt-1">{value}</div>
-    </div>
+    <Link
+      href={href}
+      className="block rounded-xl border border-gray-100 px-4 py-3 text-sm font-medium text-gray-700 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
+    >
+      {label}
+    </Link>
   );
 }

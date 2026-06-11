@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     console.error("LOGIN_ERROR:", error);
 
     return NextResponse.json(
-      { message: "خطا در ورود به سیستم." },
+      { message: "خطا در ورود به سامانه." },
       { status: 500 }
     );
   }
